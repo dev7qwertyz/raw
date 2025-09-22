@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Raw Binary to Image</title>
+<style>
+    body { font-family: Arial, sans-serif; padding: 20px; background: #f4f4f4; }
+    input, button { padding: 10px; margin: 5px 0; width: 100%; max-width: 400px; }
+    img { margin-top: 20px; max-width: 100%; border: 1px solid #ccc; }
+</style>
+</head>
+<body>
+
+<h2>Raw Binary URL → Image</h2>
+<p>Paste a link to a raw PNG or other image:</p>
+<input type="text" id="urlInput" placeholder="https://example.com/raw_image.png">
+<button onclick="convert()">Convert & Display</button>
+
+<div id="result"></div>
+
+<script>
+async function convert() {
+    const url = document.getElementById("urlInput").value.trim();
+    const resultDiv = document.getElementById("result");
+    resultDiv.innerHTML = "Loading...";
+
+    try {
+        const response = await fetch(url);
+        if (!response.ok) throw new Error("Failed to fetch URL");
+
+        const blob = await response.blob(); // get binary data
+        const imgURL = URL.createObjectURL(blob);
+
+        // Create image element
+        const img = document.createElement("img");
+        img.src = imgURL;
+
+        // Create download link
+        const downloadLink = document.createElement("a");
+        downloadLink.href = imgURL;
+        downloadLink.download = url.split("/").pop() || "image.png";
+        downloadLink.textContent = "Download Image";
+        downloadLink.style.display = "block";
+        downloadLink.style.marginTop = "10px";
+
+        resultDiv.innerHTML = ""; // clear previous
+        resultDiv.appendChild(img);
+        resultDiv.appendChild(downloadLink);
+    } catch (err) {
+        resultDiv.innerHTML = "Error: " + err.message;
+    }
+}
+</script>
+
+</body>
+</html>
